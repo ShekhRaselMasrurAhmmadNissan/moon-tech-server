@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const products = require('./Data/products.json');
 require('dotenv').config();
 
 const app = express();
@@ -17,8 +16,42 @@ const client = new MongoClient(uri, {
 	serverApi: ServerApiVersion.v1,
 });
 
-app.get('/products', (req, res) => {
-	res.send(products);
+const run = async () => {
+	try {
+		const db = client.db('MoonTech');
+		const ProductCollection = db.collection('Product');
+
+		app.get('/products', async (req, res) => {
+			const cursor = ProductCollection.find({});
+			const product = await cursor.toArray();
+
+			res.send({ status: true, data: product });
+		});
+
+		app.post('/product', async (req, res) => {
+			const product = req.body;
+
+			const result = await ProductCollection.insertOne(product);
+
+			res.send(result);
+		});
+
+		app.delete('/product/:id', async (req, res) => {
+			const id = req.params.id;
+
+			const result = await ProductCollection.deleteOne({
+				_id: ObjectId(id),
+			});
+			res.send(result);
+		});
+	} finally {
+	}
+};
+
+run().catch((err) => console.log(err));
+
+app.get('/', (req, res) => {
+	res.send('Hello World!');
 });
 
 app.listen(port, () => {
