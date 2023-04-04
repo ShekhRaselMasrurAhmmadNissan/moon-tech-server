@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors());
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@moontech.db0boi4.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
 	useNewUrlParser: true,
@@ -40,7 +40,7 @@ const run = async () => {
 			const id = req.params.id;
 
 			const result = await ProductCollection.deleteOne({
-				_id: ObjectId(id),
+				_id: new ObjectId(id),
 			});
 			res.send(result);
 		});
